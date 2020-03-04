@@ -5,12 +5,11 @@ python:
 install:
 - pip install -r app/requirements.txt
 
+services:
+  - docker
 
 script:
   - docker-compose exec movies flake8
-
-services:
-  - docker
 
 variables:
   IMAGE: ${CI_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}
