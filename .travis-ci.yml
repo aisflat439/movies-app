@@ -7,10 +7,5 @@ services:
 
 before_script: pip install docker-compose
 
-jobs:
-  include:
-    - stage: test
-    script: 
-    	- docker-compose exec movies flake8
-    	- docker-compose exec movies black --exclude=migrations --exclude=env .
-    	- docker-compose exec movies pytest -p no:warnings --cov=.
+script: 
+  - docker-compose exec movies flake8
