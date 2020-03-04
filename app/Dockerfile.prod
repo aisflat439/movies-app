@@ -1,0 +1,34 @@
+# pull official alipine image
+FROM python:3.8.1-alpine
+
+# set working dir
+WORKDIR /usr/src/app
+
+# set env vars
+ENV PYTHONGDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+ENV DEBUG 0
+ENV SECRET_KEY xhMWUBcQPcBeizpJJwjWjBdyrchQcaJtUPWBqVTCUdbdBmfANN
+ENV DJANGO_ALLOWED_HOSTS .herokuapp.com
+
+# install pyscopg2 deps
+RUN apk update \
+    && apk add postgresql-dev gcc python3-dev musl-dev
+
+# install deps
+RUN pip install --upgrade pip
+COPY ./requirements.txt /usr/src/app/requirements.txt
+RUN pip install -r requirements.txt
+
+# copy project
+COPY . /usr/src/app/
+
+# collect static files
+RUN python manage.py collectstatic --noinput
+
+# add and run as non-root user
+RUN adduser -D myuser
+USER myuser
+
+# run gunicorn
+CMD gunicorn drf_project.wsgi:application --bind 0.0.0.0:$PORT
