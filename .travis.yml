@@ -5,6 +5,10 @@ python:
 install:
 - pip install -r app/requirements.txt
 
+
+script:
+  - docker-compose exec movies flake8
+
 services:
   - docker
 
