@@ -5,7 +5,22 @@ python:
 services:
   - docker
 
-before_script: pip install docker-compose
+variables:
+  IMAGE: ${CI_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}
 
-script: 
-  - docker-compose exec movies flake8
+build:
+  stage: build
+  services:
+    - docker:dind
+  variables:
+    DOCKER_DRIVER: overlay2
+  script:
+    - cd app
+    - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker pull $IMAGE:latest || true
+    - docker build
+        --cache-from $IMAGE:latest
+        --tag $IMAGE:latest
+        --file ./Dockerfile.prod
+        "."
+    - docker push $IMAGE:latest
